@@ -19,8 +19,8 @@ jsonParser::~jsonParser(){
 }
 
 int jsonParser::find(std::string varibleName){
-    for (int i = 0; i < this->varNames.size()-1; i++){
-        //std::cout << this->varNames[i];
+    for (int i = 0; i < this->varNames.size(); i++){
+        std::cout << this->varNames[i];
         if (this->varNames[i] == varibleName){
             return i;
         }
@@ -161,7 +161,7 @@ int jsonParser::parse(){
                     }
                     varValues.push_back(cache);
                     cache = "";
-					skips = 0;
+		    skips = 0;
                     varAmount++;
 
                     break;
@@ -174,7 +174,7 @@ int jsonParser::parse(){
         if (varAmount > currentVarAmount){
             //std::cout << varValues[varAmount-1];
             copyElseBool = true;
-            std::cout << varValues[varAmount-1];
+
             //while (true){
             if (varValues[varAmount-1] == "false" || varValues[varAmount-1] == "true"){
                 copyElseBool = true;
@@ -228,7 +228,7 @@ int jsonParser::parse(){
                 int returnCode = object.parse();
 
                 if (returnCode != JSON_OK){
-                    std::cout << "aha";
+                    //std::cout << "aha";
                     return returnCode;
                 }
 
@@ -266,8 +266,7 @@ int jsonParser::parse(){
         }
 
         if (!elseBool){
-            if (content[index] != ' '){
-                std::cout << ((int)content[index] != 10);
+            if (content[index] != ' ' && (int)content[index] != 10 && (int)content[index] != 15){
                 return JSON_UNEXPECTED_CHAR;
             }
             //std::cout << content[index];
@@ -275,4 +274,3 @@ int jsonParser::parse(){
         index++;
     }
 }
-
