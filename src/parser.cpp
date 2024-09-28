@@ -9,7 +9,6 @@
 /// @param content json content to parse can be change later
 /// @return nothing
 
-//jsonParser::addToTable()
 jsonParser::jsonParser(std::string content){
     this->content = content;
 }
@@ -20,7 +19,6 @@ jsonParser::~jsonParser(){
 
 int jsonParser::find(std::string varibleName){
     for (int i = 0; i < this->varNames.size(); i++){
-        //std::cout << ']' << this->varNames[i] << ']';
         if (this->varNames[i] == varibleName){
             return i;
         }
@@ -94,7 +92,13 @@ int jsonParser::parse(){
     int skips = 0;
     int type = getType();
     int currentVarAmount = 0;
-
+    
+    for (int i = 0; i < content.length(); i++){
+        if ((int)content[i] == 32 || content[i] == '\n' || (int)content[index] == 10 || (int)content[index] == 15){
+            content.erase(i, 1);
+            i--;
+        }
+    }
     if (type == 1){
         objectSkips++;
     }
@@ -161,7 +165,7 @@ int jsonParser::parse(){
                     }
                     varValues.push_back(cache);
                     cache = "";
-					skips = 0;
+		            skips = 0;
                     varAmount++;
 
                     break;
@@ -172,10 +176,7 @@ int jsonParser::parse(){
         }
 
         if (varAmount > currentVarAmount){
-            //std::cout << varValues[varAmount-1];
             copyElseBool = true;
-            std::cout << varValues[varAmount-1];
-            //while (true){
             if (varValues[varAmount-1] == "false" || varValues[varAmount-1] == "true"){
                 copyElseBool = true;
                 varTypes.push_back("bool");
@@ -228,7 +229,6 @@ int jsonParser::parse(){
                 int returnCode = object.parse();
 
                 if (returnCode != JSON_OK){
-                    std::cout << "aha";
                     return returnCode;
                 }
 
@@ -266,13 +266,8 @@ int jsonParser::parse(){
         }
 
         if (!elseBool){
-            if (content[index] != ' '){
-                std::cout << ((int)content[index] != 10);
-                return JSON_UNEXPECTED_CHAR;
-            }
-            //std::cout << content[index];
+            return JSON_UNEXPECTED_CHAR;
         }
         index++;
     }
 }
-
