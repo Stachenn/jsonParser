@@ -92,13 +92,7 @@ int jsonParser::parse(){
     int skips = 0;
     int type = getType();
     int currentVarAmount = 0;
-    
-    for (int i = 0; i < content.length(); i++){
-        if ((int)content[i] == 32 || content[i] == '\n' || (int)content[index] == 10 || (int)content[index] == 15){
-            content.erase(i, 1);
-            i--;
-        }
-    }
+
     if (type == 1){
         objectSkips++;
     }
@@ -153,7 +147,7 @@ int jsonParser::parse(){
                 if ((content[index] == ',' || content[index] == '}' || content[index] == ']') && (!isInObject && !isInString)){
                     copyIndex = cache.length();
                     while (true){
-                        if (cache[copyIndex] != ' '){
+                        if (cache[copyIndex] != ' ' && cache[copyIndex] != '\n' && (int)cache[copyIndex] != 0){
                             break;
                         }
                         cache.erase(copyIndex, 1);
@@ -266,7 +260,9 @@ int jsonParser::parse(){
         }
 
         if (!elseBool){
-            return JSON_UNEXPECTED_CHAR;
+            if ((int)content[index] != 32 && content[index] != '\n' && (int)content[index] != 10 && (int)content[index] != 15 && (int)cache[copyIndex] != 0){
+                return JSON_UNEXPECTED_CHAR;
+            }    
         }
         index++;
     }
