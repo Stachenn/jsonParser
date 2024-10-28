@@ -23,7 +23,7 @@ int jsonParser::find(std::string varibleName){
             return i;
         }
     }
-    return -1;
+    return 0;
 }
 
 
