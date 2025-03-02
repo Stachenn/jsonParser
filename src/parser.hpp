@@ -21,7 +21,7 @@ class jsonParser{
         //bool checkCorrectStructure(const char* contentToCheck);
         int getType();
         int varAmount = 0;
-	int error = 0;
+	      int error = 0;
 
         std::vector <std::string> varNames = {};
         std::vector <std::string> varValues = {};
