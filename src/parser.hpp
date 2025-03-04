@@ -4,8 +4,6 @@
 #include <cstring>
 #include <vector>
 
-#include "dynamicArray.hpp"
-
 #define JSON_OK    1
 #define JSON_ERROR 0
 

@@ -115,7 +115,7 @@ int jsonParser::parse(){
                 cache += content[index];
             }
         }
-        if (content[index] == ':' || (type == 1 && (content[index] != ' ') || (type == 1 && content[index] == ',') ) ){
+        if (content[index] == ':' || (type == 1 && (content[index] != ' ') || (type == 1 && content[index] == ','))){
             elseBool = true;
             skips = 0;
             index++;
@@ -125,7 +125,9 @@ int jsonParser::parse(){
             }
 
             while (true){
-                if (content[index] != ' '){
+                std::cout << (int)content[index] << '&';
+
+                if (content[index] != ' ' && content[index] != 0 && content[index] != 10){
                     break;
                 }
                 index++;
@@ -152,7 +154,8 @@ int jsonParser::parse(){
                 if ((content[index] == ',' || content[index] == '}' || content[index] == ']') && (!isInObject && !isInString)){
                     copyIndex = cache.length();
                     while (true){
-                        if (cache[copyIndex] != ' '){
+                        std::cout << (int)cache[copyIndex] << '|';
+                        if (cache[copyIndex] != ' ' && cache[copyIndex] != 0 && cache[copyIndex] != '\n'){
                             break;
                         }
                         cache.erase(copyIndex, 1);
@@ -175,7 +178,7 @@ int jsonParser::parse(){
         }
 
         if (varAmount > currentVarAmount){
-            //std::cout << varValues[varAmount-1];
+            std::cout << '*' << varValues[varAmount-1] << '*';
             copyElseBool = true;
             //while (true){
             if (varValues[varAmount-1] == "false" || varValues[varAmount-1] == "true"){
@@ -246,9 +249,11 @@ int jsonParser::parse(){
                 }
 
             }
+
             if (copyElseBool == false){
                 return JSON_TYPE_ERROR;
             }
+
             copyElseBool = false;
 
             currentVarAmount++;
