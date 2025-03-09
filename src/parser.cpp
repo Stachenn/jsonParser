@@ -86,6 +86,7 @@ int jsonParser::parse(){
     bool scientificNotation = false;
     bool isFloat = false;
     bool isNegativeNum = false;
+    bool afterParsingObject = false;
 
     int multiplayerE = 0;
     int errorcode = 0;
@@ -101,7 +102,9 @@ int jsonParser::parse(){
 
     while (true){
         // Start saving var name
+        isObject = false;
         elseBool = false;
+        afterParsingObject = false;
         if (content[index] == '"' && type != 1){
             elseBool = true;
             while (true){
@@ -125,8 +128,6 @@ int jsonParser::parse(){
             }
 
             while (true){
-                std::cout << (int)content[index] << '&';
-
                 if (content[index] != ' ' && content[index] != 0 && content[index] != 10){
                     break;
                 }
@@ -140,7 +141,7 @@ int jsonParser::parse(){
                 if (content[index] == '/' && content[index+1] == '"'){
                   index++;
                 }
-                if (content[index] == '{' || content[index] == '[' && !isInString){
+                if ((content[index] == '{' || content[index] == '[') && !isInString){
                     isInObject = true;
                     isObject = true;
                     skips++;
@@ -153,15 +154,21 @@ int jsonParser::parse(){
                 }
                 if ((content[index] == ',' || content[index] == '}' || content[index] == ']') && (!isInObject && !isInString)){
                     copyIndex = cache.length();
+                    std::cout << varAmount;
+
                     while (true){
-                        std::cout << (int)cache[copyIndex] << '|';
+
                         if (cache[copyIndex] != ' ' && cache[copyIndex] != 0 && cache[copyIndex] != '\n'){
-                            break;
+                            if (!isInString){
+                              break;
+                            }
+                            if (cache[copyIndex] != '}' && cache[copyIndex] != ']'){
+                              break;
+                            }
                         }
                         cache.erase(copyIndex, 1);
                         copyIndex--;
                     }
-
                     if ((content[index] == '}' || content[index] == ']') && isObject){
                         cache += content[index];
                     }
@@ -178,7 +185,7 @@ int jsonParser::parse(){
         }
 
         if (varAmount > currentVarAmount){
-            std::cout << '*' << varValues[varAmount-1] << '*';
+            //std::cout << '*' << varValues[varAmount-1] << '*';
             copyElseBool = true;
             //while (true){
             if (varValues[varAmount-1] == "false" || varValues[varAmount-1] == "true"){
@@ -190,8 +197,11 @@ int jsonParser::parse(){
                 varTypes.push_back("null");
             }
             if (varValues[varAmount-1][0] == '"' && varValues[varAmount-1][varValues[varAmount-1].length()-1] == '"'){
+                std::cout << varValues[varAmount-1];
                 copyElseBool = true;
                 varTypes.push_back("string");
+                std::cout << content[index] << '@';
+
             }
             if (varValues[varAmount-1][0] > 47 && varValues[varAmount-1][0] < 58){
                 copyElseBool = true;
@@ -240,13 +250,16 @@ int jsonParser::parse(){
                 std::vector<std::string> objNames = object.getNames();
                 std::vector<std::string> objTypes = object.getTypes();
                 std::vector<std::string> objValues = object.getValues();
-
+                std::cout << content[index] << '@';
                 for (int i = 0; i < object.varAmount; i++){
 
                     varTypes.push_back(objTypes[i]);
                     varNames.push_back(objNames[i]);
                     varValues.push_back(objValues[i]);
                 }
+                varAmount += object.varAmount;
+                currentVarAmount += object.varAmount;
+                index++;
 
             }
 
@@ -259,22 +272,23 @@ int jsonParser::parse(){
             currentVarAmount++;
         }
 
-        if (content[index] == '{' || content[index] == '['){
+        if (content[index] == '{' || content[index] == '[' && !afterParsingObject){
             elseBool = true;
             objectSkips++;
         }
-        if (content[index] == '}' || content[index] == ']'){
+        if (content[index] == '}' || content[index] == ']' && !afterParsingObject){
             elseBool = true;
             objectSkips--;
         }
-        if (objectSkips == 0){
+        if (objectSkips == 0 && !afterParsingObject){
             elseBool = true;
-
+            std::cout << '-' << content[index] << '-';
             return JSON_OK;
         }
 
-        if (!elseBool){
-            if (content[index] != ' '){
+        if (!elseBool && !afterParsingObject){
+            if (content[index] != ' ' && content[index] != 10){
+                std::cout << ":|" << index << "|:";
                 std::cout << ':' << content[index] << ':';
                 return JSON_UNEXPECTED_CHAR;
             }
