@@ -1,0 +1,25 @@
+{
+    "someData":10,
+    "hell":"world",
+    "AmIHaveBrain":false,
+    "verySmartLib":";drop database",
+    "user":{
+        "Name":"admin",
+        "Password":" \"or 1=1"
+    },
+    "aha":true,
+    "sillyNumbers":[
+        0,
+        1,
+        2
+    ],
+    "database":[
+        "admin",
+        "test1",
+        "test2",
+        {
+            "user":1,
+            "password":"null"
+        }
+    ]
+}
