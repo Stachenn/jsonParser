@@ -135,11 +135,11 @@ int jsonParser::parse(){
             }
 
             while (true){
+                if (content[index] == 92 && content[index+1] == '"'){
+                  index += 2;
+                }
                 if (content[index] == '"'){
                     isInString = !isInString;
-                }
-                if (content[index] == '/' && content[index+1] == '"'){
-                  index++;
                 }
                 if ((content[index] == '{' || content[index] == '[') && !isInString){
                     isInObject = true;
@@ -154,7 +154,6 @@ int jsonParser::parse(){
                 }
                 if ((content[index] == ',' || content[index] == '}' || content[index] == ']') && (!isInObject && !isInString)){
                     copyIndex = cache.length();
-                    std::cout << varAmount;
 
                     while (true){
 
@@ -185,7 +184,6 @@ int jsonParser::parse(){
         }
 
         if (varAmount > currentVarAmount){
-            //std::cout << '*' << varValues[varAmount-1] << '*';
             copyElseBool = true;
             //while (true){
             if (varValues[varAmount-1] == "false" || varValues[varAmount-1] == "true"){
@@ -197,11 +195,8 @@ int jsonParser::parse(){
                 varTypes.push_back("null");
             }
             if (varValues[varAmount-1][0] == '"' && varValues[varAmount-1][varValues[varAmount-1].length()-1] == '"'){
-                std::cout << varValues[varAmount-1];
                 copyElseBool = true;
                 varTypes.push_back("string");
-                std::cout << content[index] << '@';
-
             }
             if (varValues[varAmount-1][0] > 47 && varValues[varAmount-1][0] < 58){
                 copyElseBool = true;
@@ -217,7 +212,7 @@ int jsonParser::parse(){
                         isFloat = true;
                     }
                     else{
-                        if (!(varValues[varAmount-1][i] > 47 && varValues[varAmount-1][i] < 58)){
+                        if (!(varValues[varAmount-1][i] > 47 && varValues[varAmount-1][i] < 58) && !isFloat){
                             return JSON_TYPE_ERROR;
                         }
                     }
@@ -243,14 +238,12 @@ int jsonParser::parse(){
                 int returnCode = object.parse();
 
                 if (returnCode != JSON_OK){
-                    std::cout << "aha";
                     return returnCode;
                 }
 
                 std::vector<std::string> objNames = object.getNames();
                 std::vector<std::string> objTypes = object.getTypes();
                 std::vector<std::string> objValues = object.getValues();
-                std::cout << content[index] << '@';
                 for (int i = 0; i < object.varAmount; i++){
 
                     varTypes.push_back(objTypes[i]);
@@ -259,8 +252,8 @@ int jsonParser::parse(){
                 }
                 varAmount += object.varAmount;
                 currentVarAmount += object.varAmount;
+                afterParsingObject = true;
                 index++;
-
             }
 
             if (copyElseBool == false){
@@ -272,28 +265,29 @@ int jsonParser::parse(){
             currentVarAmount++;
         }
 
-        if (content[index] == '{' || content[index] == '[' && !afterParsingObject){
+        if (content[index] == '{' || content[index] == '['){
             elseBool = true;
             objectSkips++;
         }
-        if (content[index] == '}' || content[index] == ']' && !afterParsingObject){
+        if (content[index] == '}' || content[index] == ']'){
             elseBool = true;
             objectSkips--;
         }
-        if (objectSkips == 0 && !afterParsingObject){
+        if (objectSkips == 0){
             elseBool = true;
-            std::cout << '-' << content[index] << '-';
+
+            //std::cout << '\n' << content[index-1] << content[index]<< content[index+1] ;
             return JSON_OK;
         }
 
         if (!elseBool && !afterParsingObject){
             if (content[index] != ' ' && content[index] != 10){
-                std::cout << ":|" << index << "|:";
-                std::cout << ':' << content[index] << ':';
                 return JSON_UNEXPECTED_CHAR;
             }
             //std::cout << content[index];
         }
-        index++;
+        if (!afterParsingObject){
+          index++;
+        }
     }
 }
